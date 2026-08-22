@@ -122,3 +122,28 @@ The following CRUD endpoints are available at `/rules`:
 - The AI rule interpretation layer has not yet been implemented.
 - Rules are strictly validated; invalid fields or missing conditions will be rejected with an explicit error.
 - Multiple rules can coexist, and the decision engine for conflict resolution will be added in a future phase.
+
+## Phase 3: Deterministic Rule Engine
+Phase 3 introduced the rule evaluator, safely isolating the evaluation of structured JSON rules without relying on natural language or LLMs. The engine maps strings and numerics properly to ensure safe evaluations and produces fully traceable output evidence per evaluation.
+
+## Phase 4: Batch Processing
+In Phase 4, we implemented the orchestration service to evaluate an entire batch of expense claims at once against all active business rules.
+
+### Synthetic Data Source
+A collection of 16 highly varied synthetic expense claims is stored locally in `backend/data/claims.json`. Real customer data is never used.
+
+### Deterministic Batch Policies
+Since the PDF requirements do not dictate how to handle multiple rule overlap or no-match edge cases, we designed deterministic policies to manage them without involving an AI layer:
+- **No-Match Policy**: If a claim matches 0 rules, the final fallback decision defaults to `ESCALATE`.
+- **Multiple-Match Policy**: If a claim matches >1 rule, we apply a "Most Restrictive Action" strategy (`REJECT` > `ESCALATE` > `APPROVE`).
+
+### Traceability
+The `BatchProcessResponse` includes a full ledger for each claim via `BatchClaimResult`, capturing:
+- The exact decision made.
+- The claim ID and data.
+- Detailed `matched_rules` evaluations containing every condition evaluated (expected vs actual values).
+
+### API Endpoint
+- **`POST /claims/process-batch`**
+  - **Body**: `[ { "id": "...", "employee": "...", ... } ]` (Optional)
+  - **Behavior**: Evaluates provided claims against all active rules. If the body is omitted or empty, it automatically loads the synthetic dataset from `claims.json`.

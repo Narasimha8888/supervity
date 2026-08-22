@@ -1,11 +1,18 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
+from typing import List, Optional
 import json
+import os
 import database, models
+from services.batch_processor import process_batch
 
 router = APIRouter(
     prefix="/rules",
     tags=["rules"],
+)
+
+claims_router = APIRouter(
+    prefix="/claims",
+    tags=["claims"],
 )
 
 def _format_rule_response(db_rule: dict) -> models.RuleResponse:
@@ -78,3 +85,46 @@ def delete_rule(rule_id: int):
         raise HTTPException(status_code=500, detail="Failed to delete rule")
         
     return {"status": "success", "message": "Rule deleted"}
+
+@claims_router.post("/process-batch", response_model=models.BatchProcessResponse)
+def process_claims_batch(claims: Optional[List[models.ExpenseClaim]] = None):
+    # Load rules
+    db_rules = database.get_all_rules()
+    
+    # Filter only active rules
+    active_rules = []
+    for r in db_rules:
+        if r["is_active"]:
+            try:
+                active_rules.append(
+                    models.RuleResponse(
+                        id=r["id"],
+                        name=r["name"],
+                        original_text=r["original_text"],
+                        structured_rule=json.loads(r["structured_rule"]),
+                        is_active=bool(r["is_active"]),
+                        created_at=r["created_at"],
+                        updated_at=r["updated_at"]
+                    )
+                )
+            except Exception:
+                # Skip malformed rules
+                continue
+                
+    if not active_rules:
+        raise HTTPException(status_code=400, detail="No active rules available for processing")
+        
+    # If no claims provided, load synthetic
+    if claims is None:
+        try:
+            claims_path = os.path.join(os.path.dirname(__file__), "data", "claims.json")
+            with open(claims_path, "r") as f:
+                claims_data = json.load(f)
+                claims = [models.ExpenseClaim(**c) for c in claims_data]
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to load synthetic claims: {str(e)}")
+            
+    if len(claims) == 0:
+        raise HTTPException(status_code=400, detail="Empty claim batch provided")
+        
+    return process_batch(claims, active_rules)

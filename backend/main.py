@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import router as rules_router
+from routes import router as rules_router, claims_router
 
 app = FastAPI(title="Policy-Driven Approval Agent API")
 
@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(rules_router)
+app.include_router(claims_router)
 
 @app.get("/health")
 def health_check():

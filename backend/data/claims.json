@@ -1,0 +1,146 @@
+[
+  {
+    "id": "EXP-101",
+    "employee": "Alex Johnson",
+    "department": "Sales",
+    "amount": 350.0,
+    "category": "Travel",
+    "description": "Client meeting in Chicago",
+    "date": "2026-08-01"
+  },
+  {
+    "id": "EXP-102",
+    "employee": "Maria Garcia",
+    "department": "Finance",
+    "amount": 1500.0,
+    "category": "Hardware",
+    "description": "New developer laptop",
+    "date": "2026-08-02"
+  },
+  {
+    "id": "EXP-103",
+    "employee": "James Smith",
+    "department": "Engineering",
+    "amount": 45.5,
+    "category": "Meals",
+    "description": "Team lunch",
+    "date": "2026-08-03"
+  },
+  {
+    "id": "EXP-104",
+    "employee": "Linda Williams",
+    "department": "Marketing",
+    "amount": 2500.0,
+    "category": "Advertising",
+    "description": "Q3 Ad campaign spend",
+    "date": "2026-08-04"
+  },
+  {
+    "id": "EXP-105",
+    "employee": "David Brown",
+    "department": "Sales",
+    "amount": 1200.0,
+    "category": "Travel",
+    "description": "Conference flight and hotel",
+    "date": "2026-08-05"
+  },
+  {
+    "id": "EXP-106",
+    "employee": "Sarah Davis",
+    "department": "HR",
+    "amount": 200.0,
+    "category": "Supplies",
+    "description": "Office stationary",
+    "date": "2026-08-06"
+  },
+  {
+    "id": "EXP-107",
+    "employee": "Michael Miller",
+    "department": "Engineering",
+    "amount": 3200.0,
+    "category": "Software",
+    "description": "Annual cloud hosting renewal",
+    "date": "2026-08-07"
+  },
+  {
+    "id": "EXP-108",
+    "employee": "Jennifer Wilson",
+    "department": "Finance",
+    "amount": 800.0,
+    "category": "Training",
+    "description": "Accounting seminar",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "EXP-109",
+    "employee": "Robert Moore",
+    "department": "Sales",
+    "amount": 90.0,
+    "category": "Meals",
+    "description": "Client dinner",
+    "date": "2026-08-09"
+  },
+  {
+    "id": "EXP-110",
+    "employee": "Jessica Taylor",
+    "department": "Marketing",
+    "amount": 150.0,
+    "category": "Travel",
+    "description": "Local event transport",
+    "date": "2026-08-10"
+  },
+  {
+    "id": "EXP-111",
+    "employee": "William Anderson",
+    "department": "IT",
+    "amount": 450.0,
+    "category": "Hardware",
+    "description": "Replacement monitors",
+    "date": "2026-08-11"
+  },
+  {
+    "id": "EXP-112",
+    "employee": "Ashley Thomas",
+    "department": "Engineering",
+    "amount": 120.0,
+    "category": "Software",
+    "description": "Monthly IDE subscriptions",
+    "date": "2026-08-12"
+  },
+  {
+    "id": "EXP-113",
+    "employee": "Richard Jackson",
+    "department": "HR",
+    "amount": 600.0,
+    "category": "Event",
+    "description": "Company offsite deposit",
+    "date": "2026-08-13"
+  },
+  {
+    "id": "EXP-114",
+    "employee": "Amanda White",
+    "department": "Sales",
+    "amount": 3000.0,
+    "category": "Event",
+    "description": "Trade show booth",
+    "date": "2026-08-14"
+  },
+  {
+    "id": "EXP-115",
+    "employee": "Charles Harris",
+    "department": "IT",
+    "amount": 85.0,
+    "category": "Supplies",
+    "description": "Cables and adapters",
+    "date": "2026-08-15"
+  },
+  {
+    "id": "EXP-116",
+    "employee": "Michelle Martin",
+    "department": "Marketing",
+    "amount": 400.0,
+    "category": "Advertising",
+    "description": "Social media promoted posts",
+    "date": "2026-08-16"
+  }
+]

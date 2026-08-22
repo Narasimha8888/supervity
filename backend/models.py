@@ -71,3 +71,46 @@ class RuleResponse(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+class ExpenseClaim(BaseModel):
+    id: str
+    employee: str
+    department: str
+    amount: float
+    category: str
+    description: str
+    date: str
+
+    @validator("amount")
+    def validate_amount(cls, v):
+        if v < 0:
+            raise ValueError("amount must be non-negative")
+        return v
+
+class ConditionResult(BaseModel):
+    field: str
+    operator: str
+    expected: Union[int, float, str]
+    actual: Optional[Union[int, float, str]] = None
+    matched: bool
+
+class EvaluationResult(BaseModel):
+    matched: bool
+    decision: Optional[str] = None
+    rule_id: Optional[str] = None
+    status: Optional[str] = None
+    reason: Optional[str] = None
+    condition_results: List[ConditionResult] = []
+
+class BatchClaimResult(BaseModel):
+    claim_id: str
+    claim_data: dict
+    decision: str
+    matched_rules: List[EvaluationResult] = []
+    
+class BatchProcessResponse(BaseModel):
+    total: int
+    approved: int
+    rejected: int
+    escalated: int
+    results: List[BatchClaimResult]
