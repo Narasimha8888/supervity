@@ -53,7 +53,7 @@ def get_gemini_client() -> genai.Client:
 def interpret_rule(rule_text: str) -> RuleInterpretationResponse:
     try:
         client = get_gemini_client()
-        model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+        model = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
         
         response = client.models.generate_content(
             model=model,
@@ -116,16 +116,22 @@ def interpret_rule(rule_text: str) -> RuleInterpretationResponse:
         )
     except APIError as e:
         logger.error(f"Gemini API Error: {e}")
+        error_str = str(e)
+        if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            return RuleInterpretationResponse(
+                status=RuleInterpretationStatus.INVALID,
+                original_text=rule_text,
+                message="AI Rate Limit Exceeded (429): Free tier quota limit reached. Please wait a few seconds and try again."
+            )
         return RuleInterpretationResponse(
             status=RuleInterpretationStatus.INVALID,
             original_text=rule_text,
-            message="An unexpected error occurred while communicating with the AI service."
+            message="An error occurred while communicating with the AI service: " + (e.message if hasattr(e, 'message') else str(e))
         )
     except Exception as e:
-        # Catch network, timeout, API errors safely
         logger.error(f"Unexpected Error: {e}")
         return RuleInterpretationResponse(
             status=RuleInterpretationStatus.INVALID,
             original_text=rule_text,
-            message="An unexpected error occurred while communicating with the AI service."
+            message=f"An unexpected error occurred: {str(e)}"
         )
