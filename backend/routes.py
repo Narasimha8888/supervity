@@ -4,6 +4,7 @@ import json
 import os
 import database, models
 from services.batch_processor import process_batch
+from services.gemini_rule_interpreter import interpret_rule
 
 router = APIRouter(
     prefix="/rules",
@@ -42,6 +43,12 @@ def get_rule(rule_id: int):
     if not rule:
         raise HTTPException(status_code=404, detail="Rule not found")
     return _format_rule_response(rule)
+
+@router.post("/interpret", response_model=models.RuleInterpretationResponse)
+def interpret_natural_language_rule(req: models.RuleInterpretationRequest):
+    # This endpoint is strictly for interpretation/preview.
+    # It does NOT save the rule to the database.
+    return interpret_rule(req.rule_text)
 
 @router.post("", response_model=models.RuleResponse)
 def create_rule(rule: models.RuleCreate):

@@ -147,3 +147,57 @@ The `BatchProcessResponse` includes a full ledger for each claim via `BatchClaim
 - **`POST /claims/process-batch`**
   - **Body**: `[ { "id": "...", "employee": "...", ... } ]` (Optional)
   - **Behavior**: Evaluates provided claims against all active rules. If the body is omitted or empty, it automatically loads the synthetic dataset from `claims.json`.
+
+## Phase 5: AI Rule Interpretation
+In Phase 5, we integrated the **OpenAI API** to interpret plain-English business rules and convert them into our deterministic structured JSON schema.
+
+### Architecture Boundaries & Security
+> [!IMPORTANT]
+> **Strict Separation of Duties**: OpenAI is used **only** to interpret natural-language business rules into a structured representation. Final expense decisions remain 100% deterministic and are made by the Python rule engine inside the backend. The AI does NOT evaluate claims or execute code.
+
+### Input/Output Flow
+1. User submits text: `"Auto-approve Sales expenses under $500."`
+2. `openai_rule_interpreter.py` translates it into our Pydantic schema using constrained JSON output instructions.
+3. The response is validated strictly by the Pydantic `StructuredRule` model.
+4. The API returns a preview response (`RuleInterpretationResponse`).
+5. **Preview Only**: The interpretation endpoint (`POST /rules/interpret`) does **not** automatically save the rule. It must be explicitly created via the Phase 2 `POST /rules` endpoint afterward.
+
+### Edge Case Handling
+- **Ambiguous Rules**: E.g. `"Approve expensive Sales expenses."` Since "expensive" has no numeric threshold, the AI detects ambiguity, aborts JSON construction, and returns a safe `AMBIGUOUS` status without guessing the amount.
+- **Unsupported Rules**: E.g. `"Approve if employee tenure > 5 years."` Since tenure is not a supported field in our schema, it returns `UNSUPPORTED`.
+- **Invalid Output / Injection**: If malicious prompt-injection occurs, the output fails Pydantic validation and safely aborts (`INVALID`).
+
+### Local Configuration
+To test with a live API key (not required for tests):
+1. Copy `.env.example` to `.env`
+2. Add your `OPENAI_API_KEY`. (Default model is `gpt-3.5-turbo` to reduce costs).
+
+**Note on Testing**: All 15 Phase 5 tests use `unittest.mock` to simulate the OpenAI API, guaranteeing the test suite runs fully offline without requiring an API key or incurring network costs.
+
+## Phase 6: React UI (Workflow-Style Redesign)
+In Phase 6, we built a professional, enterprise-grade React frontend UI to consume the existing Phase 2-5 APIs without introducing any new backend business logic. The application is designed as a unified workflow dashboard mimicking complex orchestration interfaces.
+
+### Architecture
+- **Stack**: React, Vite, Tailwind CSS (v4).
+- **Layout**: A unified two-panel dashboard (`App.jsx`) separating Policy Intake from Policy Evaluation.
+- **API Service**: Centralized `api.js` utilizing the native `fetch` API connected to `VITE_API_BASE_URL`. No API keys or secrets are stored in the frontend.
+
+### Features
+- **Left Panel (Policy Intake)**: 
+  - Allows non-technical users to input natural language rules or use demo scenarios.
+  - The UI securely passes the rule text to the `POST /rules/interpret` backend endpoint and visually renders the resulting interpretation (Valid, Ambiguous, Unsupported, or Invalid).
+  - Lists all existing active and inactive policies with explicit inline Edit, Deactivate, and Delete actions.
+- **Right Panel (Decision Workspace / Evaluation Graph)**:
+  - Features a simulated "Policy Evaluation Graph" representing the logical stages of the deterministic backend (Interpreter → Validator → Engine → Decision).
+  - Allows users to execute the Phase 4 batch processor against synthetic expense claims.
+  - Displays decisions as interactive cards.
+  - Clicking a claim slides in a massive **Execution Trace** panel, breaking down exactly which rule matched and exposing the deterministic Evidence (Expected vs. Actual) generated entirely by the Phase 3 Python Rule Engine.
+
+### Frontend Setup
+To run the frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+(Ensure the FastAPI backend is running simultaneously on port 8000). The frontend defaults to targeting `http://localhost:8000` via its `.env` configuration.

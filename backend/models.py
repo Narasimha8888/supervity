@@ -114,3 +114,18 @@ class BatchProcessResponse(BaseModel):
     rejected: int
     escalated: int
     results: List[BatchClaimResult]
+
+class RuleInterpretationStatus(str, Enum):
+    VALID = "VALID"
+    AMBIGUOUS = "AMBIGUOUS"
+    UNSUPPORTED = "UNSUPPORTED"
+    INVALID = "INVALID"
+
+class RuleInterpretationRequest(BaseModel):
+    rule_text: str
+
+class RuleInterpretationResponse(BaseModel):
+    status: RuleInterpretationStatus
+    original_text: str
+    structured_rule: Optional[StructuredRule] = None
+    message: Optional[str] = None
