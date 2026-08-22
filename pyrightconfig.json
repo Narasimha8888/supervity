@@ -1,7 +1,7 @@
 {
-  "venvPath": "backend",
+  "venvPath": "c:\\Users\\hi\\Desktop\\Policy-Driven Approval Agent\\backend",
   "venv": "venv",
   "extraPaths": [
-    "backend"
+    "c:\\Users\\hi\\Desktop\\Policy-Driven Approval Agent\\backend"
   ]
 }

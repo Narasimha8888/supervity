@@ -7,12 +7,12 @@ from services.batch_processor import process_batch
 from services.gemini_rule_interpreter import interpret_rule
 
 router = APIRouter(
-    prefix="/rules",
+    prefix="/api/rules",
     tags=["rules"],
 )
 
 claims_router = APIRouter(
-    prefix="/claims",
+    prefix="/api/claims",
     tags=["claims"],
 )
 
