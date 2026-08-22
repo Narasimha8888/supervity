@@ -72,3 +72,53 @@ You should see a successful JSON response: `{"status": "ok", "message": "API is 
 ## Assumptions
 *   The system uses synthetic/mock data only.
 *   The rules will be dynamically configured, interpreted by the LLM, and evaluated deterministically by the Python backend. The LLM will not directly make the final approval decision.
+
+## Phase 2: Configurable Business Rules
+In Phase 2, we built the foundational configurable policy model and API.
+
+### Rule Model
+Rules are stored as configuration rather than hardcoded application logic. Each rule contains:
+- `id`: Unique identifier
+- `name`: Short name for the rule
+- `original_text`: The plain-English version of the rule
+- `structured_rule`: A machine-readable JSON representation
+- `is_active`: Boolean to toggle the rule's active state
+- `created_at` / `updated_at`: Timestamps for version safety
+
+### Structured Rule Schema
+The system uses strict Pydantic validation to enforce the schema.
+- **Supported Actions**: `APPROVE`, `REJECT`, `ESCALATE`
+- **Supported Fields**: `department`, `amount`, `category`
+- **Supported Operators**: `equals`, `not_equals`, `less_than`, `less_than_or_equal`, `greater_than`, `greater_than_or_equal`
+
+**Example Structured Rule:**
+```json
+{
+  "action": "APPROVE",
+  "conditions": [
+    {
+      "field": "department",
+      "operator": "equals",
+      "value": "Sales"
+    },
+    {
+      "field": "amount",
+      "operator": "less_than",
+      "value": 500
+    }
+  ]
+}
+```
+
+### API Endpoints
+The following CRUD endpoints are available at `/rules`:
+- `GET /rules` - List all rules
+- `GET /rules/{rule_id}` - Retrieve a specific rule
+- `POST /rules` - Create a new rule
+- `PUT /rules/{rule_id}` - Update a rule (e.g. to deactivate it or change its structure)
+- `DELETE /rules/{rule_id}` - Delete a rule
+
+### Phase 2 Limitations & Notes
+- The AI rule interpretation layer has not yet been implemented.
+- Rules are strictly validated; invalid fields or missing conditions will be rejected with an explicit error.
+- Multiple rules can coexist, and the decision engine for conflict resolution will be added in a future phase.

@@ -7,17 +7,20 @@ DB_PATH = os.path.join(DB_DIR, "policy_agent.db")
 def init_db():
     """
     Initializes the SQLite database.
-    In Phase 1, we only create the database file and establish a connection.
-    Business-rule tables will be added in later phases.
+    Creates the rules table for Phase 2.
     """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Example table just to prove initialization works
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS system_config (
-            key TEXT PRIMARY KEY,
-            value TEXT
+        CREATE TABLE IF NOT EXISTS rules (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            original_text TEXT NOT NULL,
+            structured_rule TEXT NOT NULL,
+            is_active BOOLEAN NOT NULL DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     
