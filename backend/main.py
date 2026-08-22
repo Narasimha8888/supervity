@@ -4,6 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from routes import router as rules_router, claims_router
+import database
+
+# Ensure SQLite database and tables are created
+database.init_db()
 
 app = FastAPI(title="Policy-Driven Approval Agent API")
 
